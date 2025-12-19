@@ -1,65 +1,57 @@
+#include <algorithm>
 #include <iostream>
-#include <vector>
 #include <queue>
+#include <vector>
 
 using namespace std;
 
-vector<vector<bool>> visited;
-queue<pair<int, int>> q;
-
-int dx[4] = {1, -1, 0, 0};
-int dy[4] = {0, 0, 1, -1};
-
 int n, m, cnt;
+queue<int> q;
+vector<bool> visited;
+vector<vector<int>> adj;
 
-void bfs(int stax, int stay)
+void bfs(int start)
 {
-    q.push({stax, stay});
-    visited[stax][stay] = true;
-    while (!q.empty())
+  q.push(start);
+  visited[start] = true;
+  while (!q.empty())
+  {
+    int v = q.front();
+    q.pop();
+    for (int next : adj[v])
     {
-        int x = q.front().first;
-        int y = q.front().second;
-        q.pop();
-        for (int i = 0; i < 4; i++)
-        {
-            int nx = dx[i] + x;
-            int ny = dy[i] + y;
-            if (nx < 0 || nx > n || ny < 0 || ny > n)
-                continue;
-            if (visited[nx][ny] != true)
-            {
-                visited[nx][ny] = true;
-                q.push({nx, ny});
-            }
-        }
+      if (!visited[next])
+      {
+        visited[next] = true;
+        q.push(next);
+      }
     }
+  }
 }
 int main()
 {
-    cin >> n >> m;
-    visited.resize(n + 1, vector<bool>(n + 1));
-    for (int i = 0; i < m; i++)
+  cin >> n >> m;
+  visited.resize(n + 1);
+  fill(visited.begin(), visited.end(), false);
+
+  adj.resize(n + 1);
+  for (int i = 0; i < m; i++)
+  {
+    int a, b;
+    cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+
+  cnt = 0;
+  for (int i = 1; i <= n; i++)
+  {
+    if (!visited[i])
     {
-        int a, b;
-        cin >> a >> b;
-        visited[a][b] = true;
-        visited[b][a] = true;
+      bfs(i);
+      cnt++;
     }
+  }
 
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            if (!visited[i][j])
-            {
-                bfs(i, j);
-                cnt++;
-            }
-        }
-    }
-
-    cout << cnt << "\n";
-
-    return 0;
+  cout << cnt;
 }
